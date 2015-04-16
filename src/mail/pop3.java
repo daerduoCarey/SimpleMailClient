@@ -4,7 +4,9 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.util.HashMap;
 
 public class pop3 {
@@ -35,7 +37,10 @@ public class pop3 {
 		
 		// create new socket and connect it to the server
 		try{
-			socket = new Socket(server, port);
+			SocketAddress sockaddr = new InetSocketAddress(server, port);
+			socket = new Socket();
+			socket.connect(sockaddr, 3000);
+			socket.setSoTimeout(3000);
 		} catch(Exception e) {
 			System.out.println("Fail to connect to the server: " + server + " on port " + port + "!");
 			return false;
@@ -82,7 +87,7 @@ public class pop3 {
 			res = get();
 			check(res, "+OK", "PASSWORD", res);
 		} catch(Exception e) {
-			e.printStackTrace();
+			System.out.println("Error when logging in with account "+un);
 			return false;
 		}
 		
@@ -99,7 +104,6 @@ public class pop3 {
 			res = get();
 			check(res, "+OK", "QUIT", res);
 		} catch(Exception e) {
-			e.printStackTrace();
 			return false;
 		}
 		
@@ -112,11 +116,13 @@ public class pop3 {
 		String res;
 		
 		try{
+			System.out.println("----> " + t);
 			send("DELE " + t + CRLF);
 			res = get();
 			check(res, "+OK", "DELETE", res);
+			System.out.println("----> " + res);
 		} catch(Exception e) {
-			e.printStackTrace();
+			System.out.println("Error when deleting mail number "+t);
 			return false;
 		}
 		
@@ -134,7 +140,7 @@ public class pop3 {
 			check(res, "+OK", "STAT", res);
 			parse_status(res.substring(4));
 		} catch(Exception e) {
-			e.printStackTrace();
+			System.out.println("Error when viewing the status of mail server");
 			return false;
 		}
 		
@@ -168,7 +174,7 @@ public class pop3 {
 			res = get();
 			
 		} catch(Exception e) {
-			e.printStackTrace();
+			System.out.println("Error when listing all the mails");
 			return false;
 		}
 		
@@ -190,7 +196,7 @@ public class pop3 {
 			}
 			return ans;
 		} catch(Exception e) {
-			e.printStackTrace();
+			System.out.println("Error when viewing mail number "+t);
 		}
 		
 		return null;
@@ -199,7 +205,7 @@ public class pop3 {
 	public void parse_status(String x) {
 		tot_email = Integer.parseInt(x.substring(0, x.indexOf(" ")));
 		tot_size = Integer.parseInt(x.substring(x.indexOf(" ")+1, x.length()));
-		System.out.println(tot_email+" "+tot_size);
+		System.out.println("Total Mail Num: "+tot_email+", Total Size: "+tot_size);
 	}
 	
 	public void assertAll() {

@@ -4,12 +4,22 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.util.LinkedList;
 
 import it.sauronsoftware.base64.Base64;
 
 public class smtp {
+	
+	//sender to be appeared in the header of the mail
+	public void setAccount2(String acc) {
+		account2 = acc;
+		if(account2 == null || account2.intern() == "".intern()) {
+			account2 = account;
+		}
+	}
 	
 	public void setAccount(String acc) {
 		account = acc;
@@ -46,7 +56,10 @@ public class smtp {
 		
 		// create new socket and connect it to the server
 		try{
-			socket = new Socket(server, port);
+			SocketAddress sockaddr = new InetSocketAddress(server, port);
+			socket = new Socket();
+			socket.connect(sockaddr, 3000);
+			socket.setSoTimeout(3000);
 		} catch(Exception e) {
 			System.out.println("Fail to connect to the server: " + server + " on port " + port + "!");
 			return false;
@@ -113,7 +126,7 @@ public class smtp {
 			res = get();
 			check(res, "250", "MAIL FROM", res);
 			
-			String message = "From: " + account + CRLF;
+			String message = "From: " + account2 + CRLF;
 			
 			//MAIL RCPT
 			for(String recept: recept_list) {
@@ -167,6 +180,19 @@ public class smtp {
 		System.out.println("-----> "+receivedMessage);
 	}
 	
+	public void addRecepts(String input) {
+		
+		while(input.indexOf(";") != -1) {
+			String recept = input.substring(0, input.indexOf(";"));
+			addRecept(recept);
+			input = input.substring(input.indexOf(";")+1);
+		}
+		
+		if(input.length() > 0) {
+			addRecept(input);
+		}
+	}
+	
 	public void close() {
 		try {
 			socket.close();
@@ -184,7 +210,7 @@ public class smtp {
 	BufferedReader in;
 	DataOutputStream out;
 	
-	String username, account, password, subject, content;
+	String username, account, password, subject, content, account2;
 	LinkedList<String> recept_list = new LinkedList<String>();
 	
 	final String CRLF = "\r\n";
