@@ -1,6 +1,6 @@
-*******************************************************************************************
-*			SIMPLE MAIL CLIENT		designed and implemented by Kaichun Mo				  *
-*******************************************************************************************
++---------------------------------------------------------------------------------------+
+|	SIMPLE MAIL CLIENT	designed and implemented by Kaichun Mo	  		|
++---------------------------------------------------------------------------------------+
 
 This is my Simple Mail Client supporting both receiving and sending e-mails. Besides, this 
 is the project targeting as the first assignment in Computer Networking course in SJTU, 
@@ -25,7 +25,6 @@ To clear the class files compiled, type
 
 After running this program, you will see a Command User Interface and you can just follow 
 the instructions inside the program itself. Have fun when using it!
-
 
 
 2. BASICS ABOUT SMTP AND POP3
